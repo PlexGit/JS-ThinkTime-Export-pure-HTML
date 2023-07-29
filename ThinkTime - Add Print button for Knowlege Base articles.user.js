@@ -4,7 +4,7 @@
 // @version      0.1
 // @description  Add Print button for Knowlege Base articles
 // @author       You
-// @match        https://myjysk.thinktime.com/ui/knowledge-bases/*/topics/*/articles/*
+// @match        https://myjysk.thinktime.com/ui/knowledge-bases/*
 // @icon         https://www.google.com/s2/favicons?sz=64&domain=thinktime.com
 // @grant        none
 // ==/UserScript==
