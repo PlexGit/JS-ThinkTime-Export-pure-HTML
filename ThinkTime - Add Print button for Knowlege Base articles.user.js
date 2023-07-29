@@ -1,7 +1,7 @@
 // ==UserScript==
-// @name         ThinkTime - Add Print button for Knowlege Base articles
+// @name         ThinkTime - Add Print View button for Knowlege Base articles
 // @namespace    http://tampermonkey.net/
-// @version      0.3
+// @version      0.5
 // @description  Add Print button for Knowlege Base articles
 // @author       You
 // @match        https://myjysk.thinktime.com/ui/knowledge-bases/*
@@ -34,10 +34,13 @@
         // Actual modifier code
 
         // BODY replacement
-        const articleBody = document.querySelector('.kb-item-content-wrapper-module__body--n6jg5');
+        const articleBody = document.querySelector("[class^='kb-item-content-wrapper-module__body']")
         document.body.innerHTML = articleBody.innerHTML;
 
-        // Remove author/date footer inline style
+        // Edited date italic
+        document.querySelector("[class^='kb-item-view-info-module__date']").style = `font-style: italic;`;
+
+        // Author/date footer inline style
         // document.querySelector("[class^='kb-article-footnote-module__footnote']").remove();
         document.querySelector("[class^='kb-article-footnote-module__footnote']").style = `display: flex; align-items: flex-end; flex-wrap: wrap; gap: 5px; padding-top: 30px; padding-bottom: 30px; flex-direction: column; font-style: italic;`;
 
