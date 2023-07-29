@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         ThinkTime - Add Print button for Knowlege Base articles
 // @namespace    http://tampermonkey.net/
-// @version      0.1
+// @version      0.3
 // @description  Add Print button for Knowlege Base articles
 // @author       You
 // @match        https://myjysk.thinktime.com/ui/knowledge-bases/*
@@ -18,7 +18,7 @@
 
     function addButton(text, onclick, cssObj) {
         // cssObj = cssObj || {position: 'absolute', bottom: '7%', left:'4%', 'z-index': 3}
-        cssObj = cssObj || {position: 'fixed', bottom: '7%', left:'24px', 'z-index': 3}
+        cssObj = cssObj || {position: 'fixed', bottom: '24px', right:'24px', 'z-index': 3}
         let button = document.createElement('button'), btnStyle = button.style;
         document.body.appendChild(button);
         button.className = 'tt-icon-button medium';
