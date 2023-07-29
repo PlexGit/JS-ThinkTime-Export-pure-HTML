@@ -13,14 +13,15 @@
     'use strict';
 
     window.addEventListener('load', () => {
-        addButton('<span style="font-size:36px;">🖨</span>', applyPrintView)
+        addButton('<span style="font-size:28px;">&#128196;</span>', applyPrintView)
     })
 
     function addButton(text, onclick, cssObj) {
         // cssObj = cssObj || {position: 'absolute', bottom: '7%', left:'4%', 'z-index': 3}
-        cssObj = cssObj || {position: 'fixed', bottom: '7%', left:'4%', 'z-index': 3}
+        cssObj = cssObj || {position: 'fixed', bottom: '7%', left:'24px', 'z-index': 3}
         let button = document.createElement('button'), btnStyle = button.style;
         document.body.appendChild(button);
+        button.className = 'tt-icon-button medium';
         button.innerHTML = text;
         button.onclick = onclick;
         Object.keys(cssObj).forEach(function(key) {
@@ -78,6 +79,7 @@
         removeAttributeByName('base');
         removeAttributeByName('class');
         removeAttributeByName('id');
+        removeAttributeByName('data-cy');
         removeAttributeByName('data-test-landmark');
         removeAttributeByName('data-new-gr-c-s-check-loaded');
         removeAttributeByName('data-gr-ext-installed');
