@@ -41,7 +41,6 @@
         document.querySelector("[class^='kb-item-view-info-module__date']").style = `font-style: italic;`;
 
         // Author/date footer inline style
-        // document.querySelector("[class^='kb-article-footnote-module__footnote']").remove();
         document.querySelector("[class^='kb-article-footnote-module__footnote']").style = `display: flex; align-items: flex-end; flex-wrap: wrap; gap: 5px; padding-top: 30px; padding-bottom: 30px; flex-direction: column; font-style: italic;`;
 
         // Remove article wide view button
