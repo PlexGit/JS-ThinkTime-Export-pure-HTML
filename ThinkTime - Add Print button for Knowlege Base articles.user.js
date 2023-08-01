@@ -39,18 +39,18 @@
 	function applyPrintView() {
 		// Actual modifier code
 
-        //Remove CLASS from HTML
-        var htmlElement = document.querySelector('html');
-        htmlElement.removeAttribute('class');
+		//Remove CLASS from HTML
+		var htmlElement = document.querySelector('html');
+		htmlElement.removeAttribute('class');
 
-        // Remove BASE tag from HEAD
-        // Find the <base> tag
-        var baseTag = document.querySelector('base');
-        // Check if the <base> tag exists before attempting to remove it
-        if (baseTag) {
-            // Remove the <base> tag from the head
-            baseTag.parentNode.removeChild(baseTag);
-        }
+		// Remove BASE tag from HEAD
+		// Find the <base> tag
+		var baseTag = document.querySelector('base');
+		// Check if the <base> tag exists before attempting to remove it
+		if (baseTag) {
+			// Remove the <base> tag from the head
+			baseTag.parentNode.removeChild(baseTag);
+		}
 
 		// BODY replacement
 		const articleBody = document.querySelector("[class^='kb-item-content-wrapper-module__body']")
@@ -58,14 +58,14 @@
 
 		// Edited date italic
 		document.querySelector("[class^='kb-item-view-info-module__date']").style =
-            `font-style: italic; font-size: 10pt;`;
-        document.querySelector("[class^='kb-item-view-info-module__date']").parentNode.style =
-            `margin-bottom:1.75em;`
+			`font-style: italic; font-size: 10pt;`;
+		document.querySelector("[class^='kb-item-view-info-module__date']").parentNode.style =
+			`margin-bottom:1.75em;`
 
 		// Author/date footer inline style
 		document.querySelector("[class^='kb-article-footnote-module__footnote']").style =
-            `display: flex; align-items: flex-end; flex-wrap: wrap; gap: 5px; flex-direction: column; ` +
-            `padding-top: 30px; padding-bottom: 30px; font-style: italic; font-size: 10pt;`;
+			`display: flex; align-items: flex-end; flex-wrap: wrap; gap: 5px; flex-direction: column; ` +
+			`padding-top: 30px; padding-bottom: 30px; font-style: italic; font-size: 10pt;`;
 
 		// Remove article wide view button
 		document.querySelector("[class^='kb-article-view-module__expand']").remove();
@@ -125,8 +125,8 @@
 		removeTagByName('style');
 		removeTagByName('object');
 		removeTagByName('script');
-        removeTagByName('noscript');
-        removeTagByName('tt-icon-button');
+		removeTagByName('noscript');
+		removeTagByName('tt-icon-button');
 		removeTagByName('app-content');
 		removeTagByName('grammarly-desktop-integration');
 
@@ -148,9 +148,9 @@
 				element.removeAttribute(attributeName);
 			}
 		}
-        removeAttributeByName('id');
+		removeAttributeByName('id');
 		removeAttributeByName('class');
-        removeAttributeByName('base');
+		removeAttributeByName('base');
 		removeAttributeByName('data-cy');
 		removeAttributeByName('data-test-landmark');
 		removeAttributeByName('data-new-gr-c-s-check-loaded');
@@ -169,21 +169,21 @@
 		middleDiv.remove();
 
 		// Add printable styles to HEAD
-        const printableStyle =
-              `<style>` +
-              `*{font-family:Verdana;line-height:1.5} ` +
-              `h1,h2{line-height:1.2} ` +
-              `h2{border-top:1px solid lightgray;margin-top:1.75em;padding-top:0.75em} ` +
-              `h2:first-child{margin-top: 0;} ` +
-              `h1{font-size:1.8em} ` +
-              `h2{font-size:1.35em} ` +
-              `figcaption{font-size:smaller;color:gray} ` +
-              `li{margin-top:5px;margin-bottom:5px} ` +
-              `@media print{` +
-              `      p{break-inside:avoid ` +
-              `      h1,h2,h3,h4,h5,h6{-webkit-break-after:avoid;break-after:avoid}}` +
-              `} ` +
-              `</style>`
+		const printableStyle =
+			`<style>` +
+			`*{font-family:Verdana;line-height:1.5} ` +
+			`h1,h2{line-height:1.2} ` +
+			`h2{border-top:1px solid lightgray;margin-top:1.75em;padding-top:0.75em} ` +
+			`h2:first-child{margin-top: 0;} ` +
+			`h1{font-size:1.8em} ` +
+			`h2{font-size:1.35em} ` +
+			`figcaption{font-size:smaller;color:gray} ` +
+			`li{margin-top:5px;margin-bottom:5px} ` +
+			`@media print{` +
+			`      p{break-inside:avoid ` +
+			`      h1,h2,h3,h4,h5,h6{-webkit-break-after:avoid;break-after:avoid}}` +
+			`} ` +
+			`</style>`
 		document.head.insertAdjacentHTML("beforeend", printableStyle);
 	}
 
