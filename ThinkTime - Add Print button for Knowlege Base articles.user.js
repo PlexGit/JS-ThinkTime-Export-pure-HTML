@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         ThinkTime - Add Print View button for Knowlege Base articles
 // @namespace    http://tampermonkey.net/
-// @version      0.73
+// @version      0.75
 // @description  Add Print View button for Knowlege Base articles on ThinkTime platform
 // @author       You
 // @match        https://myjysk.thinktime.com/ui/knowledge-bases/*
@@ -38,6 +38,19 @@
 
 	function applyPrintView() {
 		// Actual modifier code
+
+        //Remove CLASS from HTML
+        var htmlElement = document.querySelector('html');
+        htmlElement.removeAttribute('class');
+
+        // Remove BASE tag from HEAD
+        // Find the <base> tag
+        var baseTag = document.querySelector('base');
+        // Check if the <base> tag exists before attempting to remove it
+        if (baseTag) {
+            // Remove the <base> tag from the head
+            baseTag.parentNode.removeChild(baseTag);
+        }
 
 		// BODY replacement
 		const articleBody = document.querySelector("[class^='kb-item-content-wrapper-module__body']")
@@ -107,10 +120,11 @@
 			const elementsToRemove = Array.from(document.getElementsByTagName(tagName));
 			elementsToRemove.forEach(element => element.remove());
 		}
-		removeTagByName('tt-icon-button');
 		removeTagByName('style');
 		removeTagByName('object');
 		removeTagByName('script');
+        removeTagByName('noscript');
+        removeTagByName('tt-icon-button');
 		removeTagByName('app-content');
 		removeTagByName('grammarly-desktop-integration');
 
