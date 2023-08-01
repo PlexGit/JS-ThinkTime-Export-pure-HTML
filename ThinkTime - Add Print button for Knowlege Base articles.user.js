@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         ThinkTime - Add Print View button for Knowlege Base articles
 // @namespace    http://tampermonkey.net/
-// @version      0.7
+// @version      0.72
 // @description  Add Print View button for Knowlege Base articles on ThinkTime platform
 // @author       You
 // @match        https://myjysk.thinktime.com/ui/knowledge-bases/*
@@ -59,8 +59,9 @@
 		// Remove views/attachments counter
 		document.querySelector("[class^='kb-item-view-info-module__sections']").remove();
 
+		// =========================
 		// MASS CLEANING STARTS HERE
-		// =================================================================
+		// =========================
 
 		// Unwrapping tt-rtf-sandbox to avoid excessive text information
 		// Get a list of all <tt-rtf-sandbox> elements
@@ -77,6 +78,25 @@
 			const parentElement = ttRtfSandbox.parentNode;
 			// Replace <tt-rtf-sandbox> with the new section element
 			parentElement.replaceChild(sectionElement, ttRtfSandbox);
+		});
+
+		// Make inner section to replace outer section
+		// Get references to the outer section elements
+		const outerSections = document.querySelectorAll('div > section');
+		// Loop through each outer section
+		outerSections.forEach(outerSection => {
+			// Get references to the inner section elements inside the outer section
+			const innerSections = outerSection.querySelectorAll('section');
+			// Move the content of the inner section to the outer section
+			innerSections.forEach(innerSection => {
+				while (innerSection.firstChild) {
+					outerSection.appendChild(innerSection.firstChild);
+				}
+			});
+			// Remove the inner sections
+			innerSections.forEach(innerSection => {
+				innerSection.remove();
+			});
 		});
 
 		//Remove sections footers
@@ -119,6 +139,18 @@
 		removeAttributeByName('data-test-landmark');
 		removeAttributeByName('data-new-gr-c-s-check-loaded');
 		removeAttributeByName('data-gr-ext-installed');
+
+		// Remove excessive DIVs in created date section
+		// Get the reference to the innermost div element
+		const innermostDiv = document.querySelector('div div div');
+		// Get the reference to its parent element (the middle div)
+		const middleDiv = innermostDiv.parentNode;
+		// Move the content of the innermost div to the parent of the middle div
+		while (innermostDiv.firstChild) {
+			middleDiv.parentNode.insertBefore(innermostDiv.firstChild, middleDiv);
+		}
+		// Remove the middle div
+		middleDiv.remove();
 
 		// Add printable styles to HEAD
 		document.head.insertAdjacentHTML("beforeend", `<style>*{font-family:Verdana;line-height:1.5} h1,h2{line-height:1.2} h2{border-top:1px solid lightgray;margin-top:1.75em;padding-top:0.75em} h1{font-size:1.8em} h2{font-size:1.35em} figcaption{font-size:smaller;color:gray} li{margin-top:5px;margin-bottom:5px} @media print{p{break-inside:avoid h1,h2,h3,h4,h5,h6{-webkit-break-after:avoid;break-after:avoid}}}</style>`);
