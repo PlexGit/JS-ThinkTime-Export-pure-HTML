@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         ThinkTime - Add Print View button for Knowlege Base articles
 // @namespace    http://tampermonkey.net/
-// @version      0.75
+// @version      0.77
 // @description  Add Print View button for Knowlege Base articles on ThinkTime platform
 // @author       You
 // @match        https://myjysk.thinktime.com/ui/knowledge-bases/*
@@ -55,15 +55,17 @@
 		// BODY replacement
 		const articleBody = document.querySelector("[class^='kb-item-content-wrapper-module__body']")
 		document.body.innerHTML = articleBody.innerHTML;
-		// document.body.removeAttribute('data-new-gr-c-s-check-loaded');
-		// document.body.removeAttribute('data-gr-ext-installed');
-		// document.body.removeAttribute('style');
 
 		// Edited date italic
-		document.querySelector("[class^='kb-item-view-info-module__date']").style = `font-style: italic; font-size: 10pt;`;
+		document.querySelector("[class^='kb-item-view-info-module__date']").style =
+            `font-style: italic; font-size: 10pt;`;
+        document.querySelector("[class^='kb-item-view-info-module__date']").parentNode.style =
+            `margin-bottom:1.75em;`
 
 		// Author/date footer inline style
-		document.querySelector("[class^='kb-article-footnote-module__footnote']").style = `display: flex; align-items: flex-end; flex-wrap: wrap; gap: 5px; padding-top: 30px; padding-bottom: 30px; flex-direction: column; font-style: italic; font-size: 10pt;`;
+		document.querySelector("[class^='kb-article-footnote-module__footnote']").style =
+            `display: flex; align-items: flex-end; flex-wrap: wrap; gap: 5px; flex-direction: column; ` +
+            `padding-top: 30px; padding-bottom: 30px; font-style: italic; font-size: 10pt;`;
 
 		// Remove article wide view button
 		document.querySelector("[class^='kb-article-view-module__expand']").remove();
@@ -167,7 +169,22 @@
 		middleDiv.remove();
 
 		// Add printable styles to HEAD
-		document.head.insertAdjacentHTML("beforeend", `<style>*{font-family:Verdana;line-height:1.5} h1,h2{line-height:1.2} h2{border-top:1px solid lightgray;margin-top:1.75em;padding-top:0.75em} h1{font-size:1.8em} h2{font-size:1.35em} figcaption{font-size:smaller;color:gray} li{margin-top:5px;margin-bottom:5px} @media print{p{break-inside:avoid h1,h2,h3,h4,h5,h6{-webkit-break-after:avoid;break-after:avoid}}}</style>`);
+        const printableStyle =
+              `<style>` +
+              `*{font-family:Verdana;line-height:1.5} ` +
+              `h1,h2{line-height:1.2} ` +
+              `h2{border-top:1px solid lightgray;margin-top:1.75em;padding-top:0.75em} ` +
+              `h2:first-child{margin-top: 0;} ` +
+              `h1{font-size:1.8em} ` +
+              `h2{font-size:1.35em} ` +
+              `figcaption{font-size:smaller;color:gray} ` +
+              `li{margin-top:5px;margin-bottom:5px} ` +
+              `@media print{` +
+              `      p{break-inside:avoid ` +
+              `      h1,h2,h3,h4,h5,h6{-webkit-break-after:avoid;break-after:avoid}}` +
+              `} ` +
+              `</style>`
+		document.head.insertAdjacentHTML("beforeend", printableStyle);
 	}
 
 })();
