@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         ThinkTime - Add Print View button for Knowlege Base articles
 // @namespace    http://tampermonkey.net/
-// @version      0.72
+// @version      0.73
 // @description  Add Print View button for Knowlege Base articles on ThinkTime platform
 // @author       You
 // @match        https://myjysk.thinktime.com/ui/knowledge-bases/*
@@ -125,16 +125,16 @@
 		document.documentElement.removeAttribute('style');
 		document.documentElement.removeAttribute('data-js-focus-visible');
 
-		// Remove all classes for all tags
+		// Remove some attributes (including IDs and CLASSes) for all tags
 		function removeAttributeByName(attributeName) {
 			const allElements = document.getElementsByTagName('*');
 			for (const element of allElements) {
 				element.removeAttribute(attributeName);
 			}
 		}
-		removeAttributeByName('base');
+        removeAttributeByName('id');
 		removeAttributeByName('class');
-		removeAttributeByName('id');
+        removeAttributeByName('base');
 		removeAttributeByName('data-cy');
 		removeAttributeByName('data-test-landmark');
 		removeAttributeByName('data-new-gr-c-s-check-loaded');
