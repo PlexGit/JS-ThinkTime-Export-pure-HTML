@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         ThinkTime - Add Print View button for Knowlege Base articles
 // @namespace    http://tampermonkey.net/
-// @version      0.77
+// @version      0.78
 // @description  Add Print View button for Knowlege Base articles on ThinkTime platform
 // @author       You
 // @match        https://myjysk.thinktime.com/ui/knowledge-bases/*
@@ -9,182 +9,206 @@
 // @grant        none
 // ==/UserScript==
 
-(function() {
-	'use strict';
+(function () {
+  "use strict";
 
-	window.addEventListener('load', () => {
-		addButton('<span style="font-size:28px;">&#128196;</span>', applyPrintView)
-	})
+  window.addEventListener("load", () => {
+    addButton('<span style="font-size:28px;">&#128196;</span>', applyPrintView);
+  });
 
-	function addButton(text, onclick, cssObj) {
-		// cssObj = cssObj || {position: 'absolute', bottom: '7%', left:'4%', 'z-index': 3}
-		cssObj = cssObj || {
-			position: 'fixed',
-			bottom: '24px',
-			right: '24px',
-			'z-index': 3
-		}
-		let button = document.createElement('button'),
-			btnStyle = button.style;
-		document.body.appendChild(button);
-		button.className = 'tt-icon-button medium';
-		button.innerHTML = text;
-		button.onclick = onclick;
-		Object.keys(cssObj).forEach(function(key) {
-			btnStyle[key] = cssObj[key];
-		});
-		return button;
-	}
+  function addButton(text, onclick, cssObj) {
+    // cssObj = cssObj || {position: 'absolute', bottom: '7%', left:'4%', 'z-index': 3}
+    cssObj = cssObj || {
+      position: "fixed",
+      bottom: "24px",
+      right: "24px",
+      "z-index": 3,
+    };
+    let button = document.createElement("button"),
+      btnStyle = button.style;
+    document.body.appendChild(button);
+    button.className = "tt-icon-button medium";
+    button.innerHTML = text;
+    button.onclick = onclick;
+    Object.keys(cssObj).forEach(function (key) {
+      btnStyle[key] = cssObj[key];
+    });
+    return button;
+  }
 
-	function applyPrintView() {
-		// Actual modifier code
+  function applyPrintView() {
+    // Remove CLASS from HTML
+    document.querySelector("html").removeAttribute("class");
 
-		//Remove CLASS from HTML
-		var htmlElement = document.querySelector('html');
-		htmlElement.removeAttribute('class');
+    // Remove BASE tag from HEAD if exists
+    const baseTag = document.querySelector("base");
+    if (baseTag) {
+      baseTag.parentNode.removeChild(baseTag);
+    }
 
-		// Remove BASE tag from HEAD
-		// Find the <base> tag
-		var baseTag = document.querySelector('base');
-		// Check if the <base> tag exists before attempting to remove it
-		if (baseTag) {
-			// Remove the <base> tag from the head
-			baseTag.parentNode.removeChild(baseTag);
-		}
+    // Replace BODY content with the article's body content
+    const articleBody = document.querySelector(
+      "[class^='kb-item-content-wrapper-module__body']"
+    );
+    document.body.innerHTML = articleBody.innerHTML;
 
-		// BODY replacement
-		const articleBody = document.querySelector("[class^='kb-item-content-wrapper-module__body']")
-		document.body.innerHTML = articleBody.innerHTML;
+    // Remove the STYLE attribute from the BODY element
+    document.body.removeAttribute("style");
 
-		// Edited date italic
-		document.querySelector("[class^='kb-item-view-info-module__date']").style =
-			`font-style: italic; font-size: 10pt;`;
-		document.querySelector("[class^='kb-item-view-info-module__date']").parentNode.style =
-			`margin-bottom:1.75em;`
+    // Apply styles to the edited date
+    const editedDate = document.querySelector(
+      "[class^='kb-item-view-info-module__date']"
+    );
+    editedDate.style.cssText = "font-style: italic; font-size: 10pt;";
+    editedDate.parentNode.style.marginBottom = "1.75em";
 
-		// Author/date footer inline style
-		document.querySelector("[class^='kb-article-footnote-module__footnote']").style =
-			`display: flex; align-items: flex-end; flex-wrap: wrap; gap: 5px; flex-direction: column; ` +
-			`padding-top: 30px; padding-bottom: 30px; font-style: italic; font-size: 10pt;`;
+    // Apply styles to the author/date footer
+    const footer = document.querySelector(
+      "[class^='kb-article-footnote-module__footnote']"
+    );
+    footer.style.cssText =
+      "display: flex; align-items: flex-end; flex-wrap: wrap; gap: 5px; flex-direction: column; padding-top: 30px; padding-bottom: 30px; font-style: italic; font-size: 10pt;";
 
-		// Remove article wide view button
-		document.querySelector("[class^='kb-article-view-module__expand']").remove();
+    // Remove article-wide view button and views/attachments counter
+    document
+      .querySelector("[class^='kb-article-view-module__expand']")
+      .remove();
+    document
+      .querySelector("[class^='kb-item-view-info-module__sections']")
+      .remove();
 
+    // Unwrapping tt-rtf-sandbox to avoid excessive text information
+    const ttRtfSandboxes = document.querySelectorAll("tt-rtf-sandbox");
+    ttRtfSandboxes.forEach((ttRtfSandbox) => {
+      const sectionElement = document.createElement("section");
+      while (ttRtfSandbox.firstChild) {
+        sectionElement.appendChild(ttRtfSandbox.firstChild);
+      }
+      ttRtfSandbox.replaceWith(sectionElement);
+    });
 
-		// Remove views/attachments counter
-		document.querySelector("[class^='kb-item-view-info-module__sections']").remove();
+    // Unwrap inner sections from outer sections
+    const outerSections = document.querySelectorAll("div > section");
+    outerSections.forEach((outerSection) => {
+      const innerSections = outerSection.querySelectorAll("section");
+      innerSections.forEach((innerSection) => {
+        while (innerSection.firstChild) {
+          outerSection.appendChild(innerSection.firstChild);
+        }
+      });
+      innerSections.forEach((innerSection) => {
+        innerSection.remove();
+      });
+    });
 
-		// =========================
-		// MASS CLEANING STARTS HERE
-		// =========================
+    // Remove sections footers
+    document
+      .querySelectorAll("[class^='article-section-module__footer']")
+      .forEach((el) => el.remove());
 
-		// Unwrapping tt-rtf-sandbox to avoid excessive text information
-		// Get a list of all <tt-rtf-sandbox> elements
-		const ttRtfSandboxes = document.querySelectorAll('tt-rtf-sandbox');
-		// Loop through each <tt-rtf-sandbox> element
-		ttRtfSandboxes.forEach(ttRtfSandbox => {
-			// Create a new section element to hold the content
-			const sectionElement = document.createElement('section');
-			// Move all child nodes of <tt-rtf-sandbox> to the new section element
-			while (ttRtfSandbox.firstChild) {
-				sectionElement.appendChild(ttRtfSandbox.firstChild);
-			}
-			// Get the parent element (the parent node) of <tt-rtf-sandbox>
-			const parentElement = ttRtfSandbox.parentNode;
-			// Replace <tt-rtf-sandbox> with the new section element
-			parentElement.replaceChild(sectionElement, ttRtfSandbox);
-		});
+    // Remove unnecessary tags
+    [
+      "style",
+      "object",
+      "script",
+      "noscript",
+      "tt-icon-button",
+      "app-content",
+      "grammarly-desktop-integration",
+    ].forEach((tagName) => {
+      const elementsToRemove = document.getElementsByTagName(tagName);
+      Array.from(elementsToRemove).forEach((element) => element.remove());
+    });
 
-		// Make inner section to replace outer section
-		// Get references to the outer section elements
-		const outerSections = document.querySelectorAll('div > section');
-		// Loop through each outer section
-		outerSections.forEach(outerSection => {
-			// Get references to the inner section elements inside the outer section
-			const innerSections = outerSection.querySelectorAll('section');
-			// Move the content of the inner section to the outer section
-			innerSections.forEach(innerSection => {
-				while (innerSection.firstChild) {
-					outerSection.appendChild(innerSection.firstChild);
-				}
-			});
-			// Remove the inner sections
-			innerSections.forEach(innerSection => {
-				innerSection.remove();
-			});
-		});
+    // Remove all linked styles
+    const linkElements = document.querySelectorAll('link[rel="stylesheet"]');
+    linkElements.forEach((linkElement) => linkElement.remove());
 
-		//Remove sections footers
-		document.querySelectorAll("[class^='article-section-module__footer']").forEach(el => el.remove());
+    // Remove attributes from HTML section
+    const htmlElement = document.documentElement;
+    htmlElement.removeAttribute("class");
+    htmlElement.removeAttribute("style");
+    htmlElement.removeAttribute("data-js-focus-visible");
 
-		// Remove unnecessary tags
-		function removeTagByName(tagName) {
-			const elementsToRemove = Array.from(document.getElementsByTagName(tagName));
-			elementsToRemove.forEach(element => element.remove());
-		}
-		removeTagByName('style');
-		removeTagByName('object');
-		removeTagByName('script');
-		removeTagByName('noscript');
-		removeTagByName('tt-icon-button');
-		removeTagByName('app-content');
-		removeTagByName('grammarly-desktop-integration');
+    // Remove some attributes (including IDs and CLASSes) for all tags
+    const attributesToRemove = [
+      "id",
+      "class",
+      "base",
+      "data-cy",
+      "data-test-landmark",
+      "data-new-gr-c-s-check-loaded",
+      "data-gr-ext-installed",
+    ];
+    const allElements = document.getElementsByTagName("*");
+    for (const element of allElements) {
+      attributesToRemove.forEach((attributeName) =>
+        element.removeAttribute(attributeName)
+      );
+    }
 
-		// Remove all linked styles
-		const linkElements = document.querySelectorAll('link[rel="stylesheet"]');
-		for (const linkElement of linkElements) {
-			linkElement.remove();
-		}
+    // Remove excessive DIVs in created date section
+    // Get the reference to the innermost div element
+    const innermostDiv = document.querySelector("div div div");
+    // Get the reference to its parent element (the middle div)
+    const middleDiv = innermostDiv.parentNode;
+    // Move the content of the innermost div to the parent of the middle div
+    while (innermostDiv.firstChild) {
+      middleDiv.parentNode.insertBefore(innermostDiv.firstChild, middleDiv);
+    }
+    // Remove the middle div
+    middleDiv.remove();
 
-		// Remove attributes from HTML section
-		document.documentElement.removeAttribute('class');
-		document.documentElement.removeAttribute('style');
-		document.documentElement.removeAttribute('data-js-focus-visible');
+    // Add printable styles to HEAD
+    const printableStyle = `
+    <style>
+        * {
+        font-family: Verdana;
+        line-height: 1.5;
+        }
 
-		// Remove some attributes (including IDs and CLASSes) for all tags
-		function removeAttributeByName(attributeName) {
-			const allElements = document.getElementsByTagName('*');
-			for (const element of allElements) {
-				element.removeAttribute(attributeName);
-			}
-		}
-		removeAttributeByName('id');
-		removeAttributeByName('class');
-		removeAttributeByName('base');
-		removeAttributeByName('data-cy');
-		removeAttributeByName('data-test-landmark');
-		removeAttributeByName('data-new-gr-c-s-check-loaded');
-		removeAttributeByName('data-gr-ext-installed');
+        h1, h2 {
+        line-height: 1.2;
+        }
 
-		// Remove excessive DIVs in created date section
-		// Get the reference to the innermost div element
-		const innermostDiv = document.querySelector('div div div');
-		// Get the reference to its parent element (the middle div)
-		const middleDiv = innermostDiv.parentNode;
-		// Move the content of the innermost div to the parent of the middle div
-		while (innermostDiv.firstChild) {
-			middleDiv.parentNode.insertBefore(innermostDiv.firstChild, middleDiv);
-		}
-		// Remove the middle div
-		middleDiv.remove();
+        h2 {
+        border-top: 1px solid lightgray;
+        margin-top: 1.75em;
+        padding-top: 0.75em;
+        }
 
-		// Add printable styles to HEAD
-		const printableStyle =
-			`<style>` +
-			`*{font-family:Verdana;line-height:1.5} ` +
-			`h1,h2{line-height:1.2} ` +
-			`h2{border-top:1px solid lightgray;margin-top:1.75em;padding-top:0.75em} ` +
-			`h2:first-child{margin-top: 0;} ` +
-			`h1{font-size:1.8em} ` +
-			`h2{font-size:1.35em} ` +
-			`figcaption{font-size:smaller;color:gray} ` +
-			`li{margin-top:5px;margin-bottom:5px} ` +
-			`@media print{` +
-			`      p{break-inside:avoid ` +
-			`      h1,h2,h3,h4,h5,h6{-webkit-break-after:avoid;break-after:avoid}}` +
-			`} ` +
-			`</style>`
-		document.head.insertAdjacentHTML("beforeend", printableStyle);
-	}
+        h2:first-child {
+        margin-top: 0;
+        }
 
+        h1 {
+        font-size: 1.8em;
+        }
+
+        h2 {
+        font-size: 1.35em;
+        }
+
+        figcaption {
+        font-size: smaller;
+        color: gray;
+        }
+
+        li {
+        margin-top: 5px;
+        margin-bottom: 5px;
+        }
+
+        @media print {
+        p {
+            break-inside: avoid;
+        }
+        h1, h2, h3, h4, h5, h6 {
+            -webkit-break-after: avoid;
+            break-after: avoid;
+        }
+        }
+    </style>`;
+    document.head.insertAdjacentHTML("beforeend", printableStyle);
+  }
 })();
