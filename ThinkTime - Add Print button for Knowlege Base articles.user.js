@@ -108,8 +108,9 @@
 
     // Remove unnecessary tags
     [
-      "aside",
       "nav",
+      "aside",
+      "footer",
       "style",
       "object",
       "script",
