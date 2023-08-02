@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         ThinkTime - Add Print View button for Knowlege Base articles
 // @namespace    http://tampermonkey.net/
-// @version      0.78
+// @version      0.79
 // @description  Add Print View button for Knowlege Base articles on ThinkTime platform
 // @author       You
 // @match        https://myjysk.thinktime.com/ui/knowledge-bases/*
@@ -183,7 +183,7 @@
         padding-top: 0.75em;
         }
 
-        h2:first-child {
+        h2::first-child {
         margin-top: 0;
         }
 
