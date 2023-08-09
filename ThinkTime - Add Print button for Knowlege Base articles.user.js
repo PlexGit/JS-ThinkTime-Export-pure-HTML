@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         ThinkTime - Add Print View button for Knowlege Base articles
 // @namespace    http://tampermonkey.net/
-// @version      0.81
+// @version      0.82
 // @description  Add Print View button for Knowlege Base articles on ThinkTime platform
 // @author       You
 // @match        https://myjysk.thinktime.com/ui/knowledge-bases/*
@@ -121,6 +121,7 @@
       "noscript",
       "tt-icon-button",
       "app-content",
+      "grammarly-popups",
       "grammarly-desktop-integration",
     ].forEach((tagName) => {
       const elementsToRemove = document.getElementsByTagName(tagName);
@@ -170,7 +171,7 @@
     const printableStyle = `
     <style>
         * {
-            font-family: Verdana;
+            font-family: "Verdana", "Arial", sans-serif;
             line-height: 1.5;
         }
 
