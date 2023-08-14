@@ -1,14 +1,14 @@
 // ==UserScript==
 // @name         ThinkTime - Add Print View button for Knowlege Base articles
 // @namespace    http://tampermonkey.net/
-// @version      0.84
+// @version      0.85
 // @description  Add Print View button for Knowlege Base articles on ThinkTime platform
 // @author       Oleksandr Pylypchak
 // @match        https://myjysk.thinktime.com/ui/knowledge-bases/*
 // @icon         https://www.google.com/s2/favicons?sz=64&domain=thinktime.com
 // @grant        none
-// @updateURL    https://gist.github.com/PlexGit/db248956219578ca1620c9493a92c8a0/raw/95c71cc475b55a6b27e7b7cbbbd502e1a42ec80a/ThinkTime%2520-%2520Add%2520Print%2520button%2520for%2520Knowlege%2520Base%2520articles.user.js
-// @downloadURL  https://gist.github.com/PlexGit/db248956219578ca1620c9493a92c8a0/raw/95c71cc475b55a6b27e7b7cbbbd502e1a42ec80a/ThinkTime%2520-%2520Add%2520Print%2520button%2520for%2520Knowlege%2520Base%2520articles.user.js
+// @updateURL    https://gist.github.com/PlexGit/db248956219578ca1620c9493a92c8a0/raw/ThinkTime%2520-%2520Add%2520Print%2520button%2520for%2520Knowlege%2520Base%2520articles.user.js
+// @downloadURL  https://gist.github.com/PlexGit/db248956219578ca1620c9493a92c8a0/raw/ThinkTime%2520-%2520Add%2520Print%2520button%2520for%2520Knowlege%2520Base%2520articles.user.js
 // ==/UserScript==
 
 (function () {
