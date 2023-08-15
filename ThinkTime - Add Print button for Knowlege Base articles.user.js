@@ -169,36 +169,6 @@
 		// Remove the middle div
 		middleDiv.remove();
 
-		// Remove empty or nbsp tags
-		function isWhitespaceNode(node) {
-			return node.nodeType === 3 && !/\S/.test(node.nodeValue);
-		}
-
-		function removeEmptyOrNbspTags(element) {
-			const childNodes = element.childNodes;
-			let i = childNodes.length - 1;
-
-			while (i >= 0) {
-				const node = childNodes[i];
-
-				if (node.nodeType === 1) {
-					if (
-						(node.childNodes.length === 0 || // Check for empty tags
-							(node.childNodes.length === 1 &&
-								isWhitespaceNode(node.firstChild))) && // Check for tags with only whitespace
-						node.tagName !== "IMG" // Avoid removing <img> tags
-					) {
-						node.parentNode.removeChild(node);
-					} else {
-						removeEmptyOrNbspTags(node);
-					}
-				}
-
-				i--;
-			}
-		}
-		removeEmptyOrNbspTags(document.body);
-
 		// ADD DOMAIN TO LINKS (make links absolute)
 		function addDomainToLinks(domain) {
 			const anchorTags = document.querySelectorAll('a');
