@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         ThinkTime - Add Print View button for Knowlege Base articles
 // @namespace    http://tampermonkey.net/
-// @version      0.87.2
+// @version      0.88.0
 // @description  Add Print View button for Knowlege Base articles on ThinkTime platform
 // @author       Oleksandr Pylypchak
 // @match        https://*.thinktime.com/ui/knowledge-bases/*/articles/*
@@ -76,12 +76,12 @@
 			"display: flex; align-items: flex-end; flex-wrap: wrap; gap: 5px; flex-direction: column; padding-top: 30px; padding-bottom: 30px; font-style: italic; font-size: 10pt;";
 
 		// Remove article-wide view button and views/attachments counter
-		document
-			.querySelector("[class^='kb-article-view-module__expand']")
-			.remove();
-		document
-			.querySelector("[class^='kb-item-view-info-module__sections']")
-			.remove();
+        document.querySelectorAll("[class*='kb-article-view-module__expand']").forEach(element => {
+            element.remove();
+        });
+        document.querySelectorAll("[class*='kb-item-view-info-module__sections']").forEach(element => {
+            element.remove();
+        });
 
 		// Unwrapping tt-rtf-sandbox to avoid excessive text information
 		const ttRtfSandboxes = document.querySelectorAll("tt-rtf-sandbox");
