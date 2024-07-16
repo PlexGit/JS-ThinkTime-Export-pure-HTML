@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         ThinkTime - Add Print View button for Knowlege Base articles
 // @namespace    http://tampermonkey.net/
-// @version      0.88.0
+// @version      0.88.1
 // @description  Add Print View button for Knowlege Base articles on ThinkTime platform
 // @author       Oleksandr Pylypchak
 // @match        https://*.thinktime.com/ui/knowledge-bases/*/articles/*
@@ -27,12 +27,13 @@
             height: "48px",
 			bottom: "24px",
 			right: "24px",
+            "border-radius": "50%",
 			"z-index": 3,
 		};
 		let button = document.createElement("button"),
 			btnStyle = button.style;
 		document.body.appendChild(button);
-		button.className = "icon-button-module__iconButton--3WcnW";
+		button.className = "icon-button-module__default--ZI8me";
 		button.innerHTML = text;
 		button.title = "Print View";
 		button.onclick = onclick;
