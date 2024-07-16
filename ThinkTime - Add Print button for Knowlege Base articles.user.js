@@ -33,7 +33,7 @@
 		let button = document.createElement("button"),
 			btnStyle = button.style;
 		document.body.appendChild(button);
-		button.className = "icon-button-module__default--ZI8me";
+		button.className = "icon-button-module__kindDefault--zIJk6";
 		button.innerHTML = text;
 		button.title = "Print View";
 		button.onclick = onclick;
