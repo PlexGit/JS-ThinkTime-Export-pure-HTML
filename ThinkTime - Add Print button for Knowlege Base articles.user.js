@@ -1,11 +1,13 @@
 // ==UserScript==
 // @name         ThinkTime - Add Print View button for Knowlege Base articles
 // @namespace    http://tampermonkey.net/
-// @version      0.89
+// @version      0.90
 // @description  Add Print View button for Knowlege Base articles on ThinkTime platform
 // @author       Oleksandr Pylypchak
 // @match        https://*.thinktime.com/ui/knowledge-bases/*/articles/*
 // @match        https://*.thinktime.com/ui/knowledge-bases/articles/*
+// @match        https://*.thinktime.com/ui/news/*/articles/*
+// @match        https://*.thinktime.com/ui/news/articles/*
 // @icon         https://www.google.com/s2/favicons?sz=64&domain=thinktime.com
 // @grant        none
 // @updateURL    https://gist.github.com/PlexGit/db248956219578ca1620c9493a92c8a0/raw/ThinkTime%2520-%2520Add%2520Print%2520button%2520for%2520Knowlege%2520Base%2520articles.user.js
@@ -45,7 +47,13 @@
 
 	function applyPrintView() {
 		// Remove CLASS from HTML
-		document.querySelector("html").removeAttribute("class");
+		// document.querySelector("html").removeAttribute("class");
+
+        // Remove attributes from HTML section
+		const htmlElement = document.documentElement;
+		htmlElement.removeAttribute("class");
+		htmlElement.removeAttribute("style");
+		htmlElement.removeAttribute("data-js-focus-visible");
 
 		// Remove BASE tag from HEAD if exists
 		const baseTag = document.querySelector("base");
@@ -53,36 +61,148 @@
 			baseTag.parentNode.removeChild(baseTag);
 		}
 
+        // Remove elements by class name prefix
+        [
+            "article-section-module__footer",
+            "news-item-view-info-module__avatar",
+            "news-item-view-info-module__attachment",,
+            "article-attachments-module__sectionBlock",
+            "news-item-view-info-module__dot",
+            "news-item-view-info-module__sections",
+            "kb-article-view-module__expand",
+            "kb-item-view-info-module__sections",
+            "Collapsible"
+        ].forEach((prefix) => {
+            // Select all elements on the page
+            const allElements = document.querySelectorAll('*');
+            allElements.forEach((element) => {
+                // Check each class name of the element
+                Array.from(element.classList).forEach((className) => {
+                    if (className.startsWith(prefix)) {
+                        element.remove(); // Remove the element if any of its classes start with the prefix
+                    }
+                });
+            });
+        });
+
+		// Remove unnecessary tags
+		[
+			"nav",
+			"aside",
+			"footer",
+			"style",
+			"button",
+			"form",
+			// "iframe",
+			"object",
+			"script",
+			"noscript",
+			"tt-icon-button",
+			"app-content",
+			"grammarly-popups",
+			"grammarly-desktop-integration",
+		].forEach((tagName) => {
+			const elementsToRemove = document.getElementsByTagName(tagName);
+			Array.from(elementsToRemove).forEach((element) => element.remove());
+		});
+
+		// Remove all linked styles
+		const linkElements = document.querySelectorAll('link[rel="stylesheet"]');
+		linkElements.forEach((linkElement) => linkElement.remove());
+
+        //________________________________________________________________________
 		// Replace BODY content with the article's body content
 		const articleBody = document.querySelector(
 			"[class^='kb-item-content-wrapper-module__body']"
 		);
-		document.body.innerHTML = articleBody.innerHTML;
+        if (articleBody) {
+            document.body.innerHTML = articleBody.innerHTML;
+        }
 
-		// Remove the STYLE attribute from the BODY element
+        // Replace BODY content with the NEWS article's body content
+        const newsArticleBody = document.querySelector(
+			"[class^='news-item-content-wrapper-module__body']"
+		);
+        if (newsArticleBody) {
+            document.body.innerHTML = newsArticleBody.innerHTML;
+        }
+
+		// Remove the STYLE and LANG attribute from the HTML and BODY element
 		document.body.removeAttribute("style");
+        document.documentElement.removeAttribute("style");
+        document.body.removeAttribute("lang");
+        document.documentElement.removeAttribute("lang");
 
-		// Apply styles to the edited date
+		// Apply styles to the edited date and other article metadata
 		const editedDate = document.querySelector(
 			"[class^='kb-item-view-info-module__date']"
 		);
-		editedDate.style.cssText = "font-style: italic; font-size: 10pt;";
-		editedDate.parentNode.style.marginBottom = "1.75em";
+        if (editedDate) {
+            editedDate.style.cssText = "font-style: italic; font-size: 10pt;";
+            editedDate.parentNode.style.marginBottom = "1.75em";
+        }
+        const newsEditedDate = document.querySelector(
+			"[class^='news-item-view-info-module__meta']"
+		);
+        if (newsEditedDate) {
+            newsEditedDate.style.cssText = "font-style: italic; font-size: 10pt;";
+            newsEditedDate.parentNode.style.marginBottom = "1.75em";
+        }
+        const newsFootnote = document.querySelector(
+			"[class^=' news-article-view-footnote-module__footnote']"
+		);
+        if (newsFootnote) {
+            newsFootnote.style.cssText = "font-style: italic; font-size: 10pt;";
+            newsFootnote.parentNode.style.marginBottom = "1.75em";
+        }
 
 		// Apply styles to the author/date footer
 		const footer = document.querySelector(
 			"[class^='kb-article-footnote-module__footnote']"
 		);
-		footer.style.cssText =
+		if (footer) {
+        footer.style.cssText =
 			"display: flex; align-items: flex-end; flex-wrap: wrap; gap: 5px; flex-direction: column; padding-top: 30px; padding-bottom: 30px; font-style: italic; font-size: 10pt;";
+        }
+
+        // SWAP foot and meta info to make it look like regular article
+        // Function to find the first element whose class name starts with a given prefix
+        function getElementByClassPrefix(prefix) {
+            const allElements = document.querySelectorAll('*');
+            for (const element of allElements) {
+                // Check if any class name of the element starts with the given prefix
+                for (const className of element.classList) {
+                    if (className.startsWith(prefix)) {
+                        return element; // Return the element if a match is found
+                    }
+                }
+            }
+            return null; // If no element with the prefix is found
+        }
+        // Prefixes to look for
+        const prefix1 = "news-item-view-info-module__meta";
+        const prefix2 = "news-article-view-footnote-module__footnote";
+        // Get the elements by class prefix
+        const element1 = getElementByClassPrefix(prefix1);
+        const element2 = getElementByClassPrefix(prefix2);
+        if (element1 && element2) {
+            // Swap inner content
+            const tempInnerHTML = element1.innerHTML;
+            element1.innerHTML = element2.innerHTML;
+            element2.innerHTML = tempInnerHTML;
+        } else {
+            console.log("One or both elements not found");
+        }
 
 		// Remove article-wide view button and views/attachments counter
+        /*
         document.querySelectorAll("[class*='kb-article-view-module__expand']").forEach(element => {
             element.remove();
         });
         document.querySelectorAll("[class*='kb-item-view-info-module__sections']").forEach(element => {
             element.remove();
         });
+        */
 
 		// Unwrapping tt-rtf-sandbox to avoid excessive text information
 		const ttRtfSandboxes = document.querySelectorAll("tt-rtf-sandbox");
@@ -108,42 +228,6 @@
 			});
 		});
 
-		// Remove sections footers
-		document
-			.querySelectorAll("[class^='article-section-module__footer']")
-			.forEach((el) => el.remove());
-
-		// Remove unnecessary tags
-		[
-			"nav",
-			"aside",
-			"footer",
-			"style",
-			"button",
-			"form",
-			/*"iframe",*/
-			"object",
-			"script",
-			"noscript",
-			"tt-icon-button",
-			"app-content",
-			"grammarly-popups",
-			"grammarly-desktop-integration",
-		].forEach((tagName) => {
-			const elementsToRemove = document.getElementsByTagName(tagName);
-			Array.from(elementsToRemove).forEach((element) => element.remove());
-		});
-
-		// Remove all linked styles
-		const linkElements = document.querySelectorAll('link[rel="stylesheet"]');
-		linkElements.forEach((linkElement) => linkElement.remove());
-
-		// Remove attributes from HTML section
-		const htmlElement = document.documentElement;
-		htmlElement.removeAttribute("class");
-		htmlElement.removeAttribute("style");
-		htmlElement.removeAttribute("data-js-focus-visible");
-
 		// Remove some attributes (including IDs and CLASSes) for all tags
 		const attributesToRemove = [
 			"id",
@@ -153,6 +237,7 @@
 			"data-test-landmark",
 			"data-new-gr-c-s-check-loaded",
 			"data-gr-ext-installed",
+            "data-test-distinct"
 		];
 		const allElements = document.getElementsByTagName("*");
 		for (const element of allElements) {
