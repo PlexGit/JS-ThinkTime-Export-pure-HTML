@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         ThinkTime - Add Print View button for Knowlege Base articles
 // @namespace    http://tampermonkey.net/
-// @version      0.90
+// @version      0.91
 // @description  Add Print View button for Knowlege Base articles on ThinkTime platform
 // @author       Oleksandr Pylypchak
 // @match        https://*.thinktime.com/ui/knowledge-bases/*/articles/*
@@ -46,13 +46,12 @@
 	}
 
 	function applyPrintView() {
-		// Remove CLASS from HTML
-		// document.querySelector("html").removeAttribute("class");
 
         // Remove attributes from HTML section
 		const htmlElement = document.documentElement;
 		htmlElement.removeAttribute("class");
 		htmlElement.removeAttribute("style");
+        htmlElement.removeAttribute("lang");
 		htmlElement.removeAttribute("data-js-focus-visible");
 
 		// Remove BASE tag from HEAD if exists
@@ -60,6 +59,28 @@
 		if (baseTag) {
 			baseTag.parentNode.removeChild(baseTag);
 		}
+
+        //________________________________________________________________________
+		// Replace BODY content with the article's body content
+		const articleBody = document.querySelector(
+			"[class^='kb-item-content-wrapper-module__body']"
+		);
+        if (articleBody) {
+            document.body.innerHTML = articleBody.innerHTML;
+        }
+        // Replace BODY content with the NEWS article's body content
+        const newsArticleBody = document.querySelector(
+			"[class^='news-item-content-wrapper-module__body']"
+		);
+        if (newsArticleBody) {
+            document.body.innerHTML = newsArticleBody.innerHTML;
+        }
+
+		// Remove the STYLE and LANG attribute from the HTML and BODY element
+		document.body.removeAttribute("style");
+        document.documentElement.removeAttribute("style");
+        document.body.removeAttribute("lang");
+        document.documentElement.removeAttribute("lang");
 
         // Remove elements by class name prefix
         [
@@ -110,60 +131,7 @@
 		const linkElements = document.querySelectorAll('link[rel="stylesheet"]');
 		linkElements.forEach((linkElement) => linkElement.remove());
 
-        //________________________________________________________________________
-		// Replace BODY content with the article's body content
-		const articleBody = document.querySelector(
-			"[class^='kb-item-content-wrapper-module__body']"
-		);
-        if (articleBody) {
-            document.body.innerHTML = articleBody.innerHTML;
-        }
-
-        // Replace BODY content with the NEWS article's body content
-        const newsArticleBody = document.querySelector(
-			"[class^='news-item-content-wrapper-module__body']"
-		);
-        if (newsArticleBody) {
-            document.body.innerHTML = newsArticleBody.innerHTML;
-        }
-
-		// Remove the STYLE and LANG attribute from the HTML and BODY element
-		document.body.removeAttribute("style");
-        document.documentElement.removeAttribute("style");
-        document.body.removeAttribute("lang");
-        document.documentElement.removeAttribute("lang");
-
-		// Apply styles to the edited date and other article metadata
-		const editedDate = document.querySelector(
-			"[class^='kb-item-view-info-module__date']"
-		);
-        if (editedDate) {
-            editedDate.style.cssText = "font-style: italic; font-size: 10pt;";
-            editedDate.parentNode.style.marginBottom = "1.75em";
-        }
-        const newsEditedDate = document.querySelector(
-			"[class^='news-item-view-info-module__meta']"
-		);
-        if (newsEditedDate) {
-            newsEditedDate.style.cssText = "font-style: italic; font-size: 10pt;";
-            newsEditedDate.parentNode.style.marginBottom = "1.75em";
-        }
-        const newsFootnote = document.querySelector(
-			"[class^=' news-article-view-footnote-module__footnote']"
-		);
-        if (newsFootnote) {
-            newsFootnote.style.cssText = "font-style: italic; font-size: 10pt;";
-            newsFootnote.parentNode.style.marginBottom = "1.75em";
-        }
-
-		// Apply styles to the author/date footer
-		const footer = document.querySelector(
-			"[class^='kb-article-footnote-module__footnote']"
-		);
-		if (footer) {
-        footer.style.cssText =
-			"display: flex; align-items: flex-end; flex-wrap: wrap; gap: 5px; flex-direction: column; padding-top: 30px; padding-bottom: 30px; font-style: italic; font-size: 10pt;";
-        }
+        // Making NEWS STRUCTURE article-like ________________________________________________
 
         // SWAP foot and meta info to make it look like regular article
         // Function to find the first element whose class name starts with a given prefix
@@ -194,15 +162,85 @@
             console.log("One or both elements not found");
         }
 
-		// Remove article-wide view button and views/attachments counter
-        /*
-        document.querySelectorAll("[class*='kb-article-view-module__expand']").forEach(element => {
-            element.remove();
+        //Rearranging tree - Author and date
+        // Select all elements where the class starts with the given prefix
+        const spanElements = document.querySelectorAll('[class^="news-item-view-info-module__ownerName--"]');
+        // Loop through all matching elements and unwrap them
+        spanElements.forEach(spanElement => {
+            // Get the parent element (the div)
+            const parentDiv = spanElement.parentNode;
+            // Replace the span with its content
+            if (parentDiv) {
+                parentDiv.replaceChild(document.createTextNode(spanElement.textContent), spanElement);
+            }
         });
-        document.querySelectorAll("[class*='kb-item-view-info-module__sections']").forEach(element => {
-            element.remove();
-        });
-        */
+        function convertSpanToDiv(classPrefix) {
+            // Select all span elements where the class starts with the given prefix
+            const spanElements = document.querySelectorAll(`[class^="${classPrefix}"]`);
+            // Loop through all matching elements
+            spanElements.forEach(spanElement => {
+                // Create a new div element
+                const newDiv = document.createElement('div');
+                // Copy the class from the span to the new div
+                newDiv.className = spanElement.className;
+                // Copy the content from the span to the new div
+                newDiv.textContent = spanElement.textContent;
+                // Replace the span with the new div
+                spanElement.parentNode.replaceChild(newDiv, spanElement);
+            });
+        }
+        convertSpanToDiv("news-item-view-info-module__date--");
+
+        //Rearranging update date
+        function convertDivToSpan(classPrefix) {
+            // Select all div elements where the class starts with the given prefix
+            const divElements = document.querySelectorAll(`[class*=" ${classPrefix}"]`);
+            // Loop through all matching elements
+            divElements.forEach(divElement => {
+                // Create a new span element
+                const newSpan = document.createElement('span');
+                // Copy the class from the div to the new span
+                newSpan.className = divElement.className;
+                // Copy the content from the div to the new span
+                newSpan.textContent = divElement.textContent;
+                // Replace the div with the new span
+                divElement.parentNode.replaceChild(newSpan, divElement);
+            });
+        }
+        convertDivToSpan("news-article-view-module__details--");
+
+		// Apply styles to the edited date and other article metadata
+		const editedDate = document.querySelector(
+			"[class^='kb-item-view-info-module__date']"
+		);
+        if (editedDate) {
+            editedDate.style.cssText = "font-style: italic; font-size: 10pt;";
+            editedDate.parentNode.style.marginBottom = "1.75em";
+        }
+        const newsEditedDate = document.querySelector(
+			"[class^='news-article-view-footnote-module__footnote']"
+		);
+        if (newsEditedDate) {
+            newsEditedDate.style.cssText =
+                "display: flex; align-items: flex-end; flex-wrap: wrap; gap: 5px; flex-direction: column; padding-top: 30px; padding-bottom: 30px; font-style: italic; font-size: 10pt;";
+            // newsEditedDate.parentNode.style.marginBottom = "1.75em";
+        }
+        const newsFootnote = document.querySelector(
+			"[class*=' news-article-view-module__details']"
+		);
+        if (newsFootnote) {
+            newsFootnote.style.cssText = "font-style: italic; font-size: 10pt;";
+            newsFootnote.parentNode.style.marginBottom = "1.75em";
+        }
+
+		// Apply styles to the author/date footer
+		const footer = document.querySelector(
+			"[class^='kb-article-footnote-module__footnote']"
+		);
+		if (footer) {
+        footer.style.cssText =
+			"display: flex; align-items: flex-end; flex-wrap: wrap; gap: 5px; flex-direction: column; padding-top: 30px; padding-bottom: 30px; font-style: italic; font-size: 10pt;";
+        }
 
 		// Unwrapping tt-rtf-sandbox to avoid excessive text information
 		const ttRtfSandboxes = document.querySelectorAll("tt-rtf-sandbox");
@@ -246,17 +284,27 @@
 			);
 		}
 
-		// Remove excessive DIVs in created date section
-		// Get the reference to the innermost div element
-		const innermostDiv = document.querySelector("div div div");
-		// Get the reference to its parent element (the middle div)
-		const middleDiv = innermostDiv.parentNode;
-		// Move the content of the innermost div to the parent of the middle div
-		while (innermostDiv.firstChild) {
-			middleDiv.parentNode.insertBefore(innermostDiv.firstChild, middleDiv);
-		}
-		// Remove the middle div
-		middleDiv.remove();
+        // Remove excessive DIVs in created date section
+        // Get the reference to the innermost div element
+        const innermostDiv = document.querySelector("div div div");
+        // Check if the innermostDiv exists
+        if (innermostDiv) {
+            // Get the reference to its parent element (the middle div)
+            const middleDiv = innermostDiv.parentNode;
+            // Check if middleDiv exists and has a parent
+            if (middleDiv && middleDiv.parentNode) {
+                // Move the content of the innermost div to the parent of the middle div
+                while (innermostDiv.firstChild) {
+                    middleDiv.parentNode.insertBefore(innermostDiv.firstChild, middleDiv);
+                }
+                // Remove the middle div
+                middleDiv.remove();
+            } else {
+                console.warn('Middle div or its parent does not exist.');
+            }
+        } else {
+            console.warn('Innermost div not found.');
+        }
 
 		// ADD DOMAIN TO LINKS (make links absolute)
 		function addDomainToLinks(domain) {
