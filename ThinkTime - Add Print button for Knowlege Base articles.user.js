@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         ThinkTime - Add Print View button for Knowlege Base articles
 // @namespace    http://tampermonkey.net/
-// @version      0.91.2
+// @version      0.91.3
 // @description  Add Print View button for Knowlege Base articles on ThinkTime platform
 // @author       Oleksandr Pylypchak
 // @match        https://*.thinktime.com/ui/knowledge-bases/*/articles/*
@@ -330,7 +330,7 @@
             line-height: 1.5;
         }
         h1, h2, h3, h4, h5, h6 {
-            text-wrap: pretty;
+            text-wrap: balance;
         }
         h1, h2 {
             line-height: 1.2;
