@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         ThinkTime - Add Print View button for Knowlege Base articles
 // @namespace    http://tampermonkey.net/
-// @version      0.91.3
+// @version      0.92
 // @description  Add Print View button for Knowlege Base articles on ThinkTime platform
 // @author       Oleksandr Pylypchak
 // @match        https://*.thinktime.com/ui/knowledge-bases/*/articles/*
@@ -47,6 +47,32 @@
 
 	function applyPrintView() {
 
+        // Remove elements by class name prefix
+        [
+            "Collapsible__contentInner",
+            "Collapsible__contentOuter",
+            "Collapsible",
+            "article-section-module__footer",
+            "news-item-view-info-module__avatar",
+            "news-item-view-info-module__attachment",,
+            "article-attachments-module__sectionBlock",
+            "news-item-view-info-module__dot",
+            "news-item-view-info-module__sections",
+            "kb-article-view-module__expand",
+            "kb-item-view-info-module__sections"
+        ].forEach((prefix) => {
+            // Select all elements on the page
+            const allElements = document.querySelectorAll('*');
+            allElements.forEach((element) => {
+                // Check each class name of the element
+                Array.from(element.classList).forEach((className) => {
+                    if (className.startsWith(prefix)) {
+                        element.remove(); // Remove the element if any of its classes start with the prefix
+                    }
+                });
+            });
+        });
+
         // Remove attributes from HTML section
 		const htmlElement = document.documentElement;
 		htmlElement.removeAttribute("class");
@@ -81,30 +107,6 @@
         document.documentElement.removeAttribute("style");
         document.body.removeAttribute("lang");
         document.documentElement.removeAttribute("lang");
-
-        // Remove elements by class name prefix
-        [
-            "article-section-module__footer",
-            "news-item-view-info-module__avatar",
-            "news-item-view-info-module__attachment",,
-            "article-attachments-module__sectionBlock",
-            "news-item-view-info-module__dot",
-            "news-item-view-info-module__sections",
-            "kb-article-view-module__expand",
-            "kb-item-view-info-module__sections",
-            "Collapsible"
-        ].forEach((prefix) => {
-            // Select all elements on the page
-            const allElements = document.querySelectorAll('*');
-            allElements.forEach((element) => {
-                // Check each class name of the element
-                Array.from(element.classList).forEach((className) => {
-                    if (className.startsWith(prefix)) {
-                        element.remove(); // Remove the element if any of its classes start with the prefix
-                    }
-                });
-            });
-        });
 
 		// Remove unnecessary tags
 		[
