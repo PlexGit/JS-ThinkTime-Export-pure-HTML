@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         ThinkTime - Add Print View button for Knowlege Base articles
 // @namespace    http://tampermonkey.net/
-// @version      0.92
+// @version      0.93
 // @description  Add Print View button for Knowlege Base articles on ThinkTime platform
 // @author       Oleksandr Pylypchak
 // @match        https://*.thinktime.com/ui/knowledge-bases/*/articles/*
@@ -356,8 +356,8 @@
             color: gray;
         }
         li {
-            margin-top: 5px;
-            margin-bottom: 5px;
+            margin-top: 10px;
+            margin-bottom: 10px;
         }
         img {
             max-width: 100%;
