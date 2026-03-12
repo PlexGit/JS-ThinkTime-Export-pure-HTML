@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         ThinkTime - Add Print View button for Knowlege Base articles
 // @namespace    http://tampermonkey.net/
-// @version      0.94
+// @version      0.95
 // @description  Add Print View button for Knowlege Base articles on ThinkTime platform
 // @author       Oleksandr Pylypchak
 // @match        https://*.thinktime.com/ui/knowledge-bases/*/articles/*
@@ -205,6 +205,7 @@
 		}
 		convertSpanToDiv("news-item-view-info-module__date--");
 
+        /*
 		//Rearranging update date
 		function convertDivToSpan(classPrefix) {
 			// Select all div elements where the class starts with the given prefix
@@ -222,6 +223,7 @@
 			});
 		}
 		convertDivToSpan("news-article-view-module__details--");
+        */
 
 		// Apply styles to the edited date and other article metadata
 		const editedDate = document.querySelector(
@@ -298,6 +300,7 @@
 			);
 		}
 
+		/*
 		// Remove excessive DIVs in created date section
 		// Get the reference to the innermost div element
 		const innermostDiv = document.querySelector("div div div");
@@ -319,6 +322,31 @@
 		} else {
 			console.warn('Innermost div not found.');
 		}
+        */
+
+		// Target and collapse lonely inner DIVs regardless of depth
+		// This turns <div><div><div>Content</div></div></div> into <div>Content</div>
+		const allDivs = Array.from(document.querySelectorAll('div')).reverse();
+
+		allDivs.forEach(parent => {
+			// 1. Must have exactly one child element
+			// 2. That child must be a DIV
+			// 3. The parent itself must not contain any direct text (lonely wrapper)
+			if (parent.children.length === 1 &&
+				parent.children[0].tagName === 'DIV' &&
+				parent.cloneNode(false).textContent.trim() === "") {
+
+				const innerDiv = parent.children[0];
+
+				// Move all content from the lonely inner DIV to the parent
+				while (innerDiv.firstChild) {
+					parent.appendChild(innerDiv.firstChild);
+				}
+
+				// Remove the redundant inner DIV
+				innerDiv.remove();
+			}
+		});
 
 		// ADD DOMAIN TO LINKS (make links absolute)
 		function addDomainToLinks(domain) {
