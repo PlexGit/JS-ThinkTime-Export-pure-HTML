@@ -4,6 +4,9 @@ This script adds a "Download" button to ThinkTime Knowledge Base and News articl
 It generates a standalone HTML file featuring inline CSS and Base64-encoded images, ensuring all content is embedded locally.
 Each export includes essential metadata: the original page title, source URL, and a backup timestamp.
 
+LATEST TESTED THINK-TIME VERSION: 
+2.23.0.0
+
 INSTALLATION: 
 Install extension Tampermonkey/Greasemonkey (etc.), use the URL below.
 
