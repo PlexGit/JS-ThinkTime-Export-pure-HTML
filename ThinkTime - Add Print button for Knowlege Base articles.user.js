@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name          ThinkTime - Add Print View button for Knowlege Base articles
 // @namespace     http://tampermonkey.net/
-// @version       1.0
+// @version       1.02
 // @description   Add Print View button for Knowlege Base articles on ThinkTime platform
 // @author        Oleksandr Pylypchak
 // @match         https://*.thinktime.com/ui/knowledge-bases/*/articles/*
@@ -45,9 +45,20 @@
 	}
 
 	async function applyPrintView() {
-        const originUrl = window.location.href;
-        const timestamp = new Date().toLocaleString();
-        const originalTitle = document.title;
+		const originUrl = window.location.href;
+		const originalTitle = document.title;
+
+		// --- DATE FORMATTING (DD.MM.YYYY HH:mm:ss) ---
+		const now = new Date();
+		const day = String(now.getDate()).padStart(2, '0');
+		const month = String(now.getMonth() + 1).padStart(2, '0');
+		const year = now.getFullYear();
+		const hours = String(now.getHours()).padStart(2, '0');
+		const minutes = String(now.getMinutes()).padStart(2, '0');
+		const seconds = String(now.getSeconds()).padStart(2, '0');
+
+		const formattedTimestamp = `${day}.${month}.${year} ${hours}:${minutes}:${seconds}`;
+		const fileSafeTimestamp = `${day}.${month}.${year} - ${hours}-${minutes}-${seconds}`;
 
 		// Remove elements by class name prefix
 		[
@@ -216,94 +227,55 @@
 		}
 		addDomainToLinks(window.location.origin);
 
-        // --- IMAGE PROCESSING & SAVE LOGIC ---
+		// --- IMAGE PROCESSING & SAVE LOGIC ---
+		const images = document.querySelectorAll('img');
+		const toBase64 = (img) => new Promise((resolve) => {
+			const canvas = document.createElement('canvas');
+			const ctx = canvas.getContext('2d');
+			const tempImg = new Image();
+			tempImg.crossOrigin = 'anonymous';
+			tempImg.onload = () => {
+				canvas.width = tempImg.naturalWidth;
+				canvas.height = tempImg.naturalHeight;
+				ctx.drawImage(tempImg, 0, 0);
+				resolve(canvas.toDataURL('image/png'));
+			};
+			tempImg.onerror = () => resolve(null);
+			tempImg.src = img.src;
+		});
 
-        const images = document.querySelectorAll('img');
-        const toBase64 = (img) => new Promise((resolve) => {
-            const canvas = document.createElement('canvas');
-            const ctx = canvas.getContext('2d');
-            const tempImg = new Image();
-            tempImg.crossOrigin = 'anonymous';
-            tempImg.onload = () => {
-                canvas.width = tempImg.naturalWidth;
-                canvas.height = tempImg.naturalHeight;
-                ctx.drawImage(tempImg, 0, 0);
-                resolve(canvas.toDataURL('image/png'));
-            };
-            tempImg.onerror = () => resolve(null);
-            tempImg.src = img.src;
-        });
+		for (let img of images) {
+			if (img.src && !img.src.startsWith('data:')) {
+				const b64 = await toBase64(img);
+				if (b64) img.src = b64;
+			}
+		}
 
-        for (let img of images) {
-            if (img.src && !img.src.startsWith('data:')) {
-                const b64 = await toBase64(img);
-                if (b64) img.src = b64;
-            }
-        }
-
-        // Your full printable styles included here
 		const printableStyle = `
-            * {
-                font-family: "Verdana", "Arial", sans-serif;
-                line-height: 1.5;
-            }
-            h1, h2, h3, h4, h5, h6 {
-                text-wrap: balance;
-            }
-            h1, h2 {
-                line-height: 1.2;
-            }
-            h2 {
-                border-top: 1px solid lightgray;
-                margin-top: 1.75em;
-                padding-top: 0.75em;
-            }
-            h2::first-child {
-                margin-top: 0;
-            }
-            h1 {
-                font-size: 1.8em;
-            }
-            h2 {
-                font-size: 1.35em;
-            }
-            figcaption {
-                font-size: smaller;
-                color: gray;
-            }
-            li {
-                margin-top: 0.6rem;
-                margin-bottom: 0.6rem;
-            }
-            img {
-                max-width: 100%;
-            }
-            @media print {
-                p {
-                    -webkit-break-inside: avoid;
-                    break-inside: avoid;
-                }
-                h1, h2, h3, h4, h5, h6 {
-                    -webkit-break-after: avoid;
-                    -webkit-break-inside: avoid;
-                    break-after: avoid;
-                    break-inside: avoid;
-                }
-                a[href^='http']:after {
-                    content: ' > ' attr(href);
-                    font-family: Monospace;
-                }
-            }
-        `;
+			* { font-family: "Verdana", "Arial", sans-serif; line-height: 1.5; }
+			h1, h2, h3, h4, h5, h6 { text-wrap: balance; }
+			h1, h2 { line-height: 1.2; }
+			h2 { border-top: 1px solid lightgray; margin-top: 1.75em; padding-top: 0.75em; }
+			h2::first-child { margin-top: 0; }
+			h1 { font-size: 1.8em; }
+			h2 { font-size: 1.35em; }
+			figcaption { font-size: smaller; color: gray; }
+			li { margin-top: 0.6rem; margin-bottom: 0.6rem; }
+			img { max-width: 100%; }
+			@media print {
+				p { -webkit-break-inside: avoid; break-inside: avoid; }
+				h1, h2, h3, h4, h5, h6 { -webkit-break-after: avoid; -webkit-break-inside: avoid; break-after: avoid; break-inside: avoid; }
+				a[href^='http']:after { content: ' > ' attr(href); font-family: Monospace; }
+			}
+		`;
 
-        // Assemble full HTML with meta tags and styles
-        const finalHtml = `<!DOCTYPE html>
+		const finalHtml = `<!DOCTYPE html>
 <html>
 <head>
     <meta charset="UTF-8">
     <meta name="original-page-name" content="${originalTitle.replace(/"/g, '&quot;')}">
     <meta name="original-url" content="${originUrl}">
-    <meta name="save-timestamp" content="${timestamp}">
+    <meta name="save-timestamp" content="${formattedTimestamp}">
     <title>${originalTitle}</title>
     <style>${printableStyle}</style>
 </head>
@@ -312,19 +284,17 @@
 </body>
 </html>`;
 
-        const safeTitle = originalTitle.replace(/[\\/:"*?<>|]/g, '_').trim();
-        const fileTimestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19);
-        const fileName = `${safeTitle}_${fileTimestamp}.html`;
+		const safeTitle = originalTitle.replace(/[\\/:"*?<>|]/g, '_').trim();
+		const fileName = `${safeTitle} - ${fileSafeTimestamp}.html`;
 
-        const blob = new Blob([finalHtml], { type: 'text/html' });
-        const a = document.createElement('a');
-        a.href = URL.createObjectURL(blob);
-        a.download = fileName;
-        a.click();
-        URL.revokeObjectURL(a.href);
+		const blob = new Blob([finalHtml], { type: 'text/html' });
+		const a = document.createElement('a');
+		a.href = URL.createObjectURL(blob);
+		a.download = fileName;
+		a.click();
+		URL.revokeObjectURL(a.href);
 
-        // Finalize the current view
-        document.head.insertAdjacentHTML("beforeend", `<style>${printableStyle}</style>`);
-        console.log(`Saved as: ${fileName}`);
+		document.head.insertAdjacentHTML("beforeend", `<style>${printableStyle}</style>`);
+		console.log(`Saved as: ${fileName}`);
 	}
 })();
