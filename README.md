@@ -8,5 +8,6 @@ ThinkTime - Add Print button for Knowledge Base articles
 (Tampermonkey script)
 https://github.com/PlexGit/JS-ThinkTime-Export-pure-HTML/raw/refs/heads/main/ThinkTime-Export-pure-HTML.user.js
 
-BUGS
+BUGS:
+
 If the button is missing after navigating to an article, please refresh the page to initialize the script.
