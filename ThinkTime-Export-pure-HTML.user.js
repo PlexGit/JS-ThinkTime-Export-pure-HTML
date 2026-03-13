@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name          ThinkTime - Export pure HTML
 // @namespace     http://tampermonkey.net/
-// @version       1.05
+// @version       1.06
 // @description   Add Print View button for Knowlege Base articles on ThinkTime platform
 // @author        Oleksandr Pylypchak
 // @match         https://*.thinktime.com/ui/knowledge-bases/*/articles/*
@@ -89,6 +89,7 @@
 		htmlElement.removeAttribute("style");
 		htmlElement.removeAttribute("lang");
 		htmlElement.removeAttribute("data-js-focus-visible");
+		htmlElement.removeAttribute("data-class");
 
 		const wysiwygElements = document.querySelectorAll('[style*="--wysiwyg"]');
 		wysiwygElements.forEach(el => {
