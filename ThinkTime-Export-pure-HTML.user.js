@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name          ThinkTime - Export pure HTML
 // @namespace     http://tampermonkey.net/
-// @version       1.04
+// @version       1.05
 // @description   Add Print View button for Knowlege Base articles on ThinkTime platform
 // @author        Oleksandr Pylypchak
 // @match         https://*.thinktime.com/ui/knowledge-bases/*/articles/*
@@ -10,8 +10,8 @@
 // @match         https://*.thinktime.com/ui/news/articles/*
 // @icon          https://www.google.com/s2/favicons?sz=64&domain=thinktime.com
 // @grant         none
-// @updateURL     https://github.com/PlexGit/JS---ThinkTime---Add-Print-button-for-Knowlege-Base-articles/raw/refs/heads/main/ThinkTime%20-%20Export%20pure%20HTML.user.js
-// @downloadURL   https://github.com/PlexGit/JS---ThinkTime---Add-Print-button-for-Knowlege-Base-articles/raw/refs/heads/main/ThinkTime%20-%20Export%20pure%20HTML.user.js
+// @updateURL     https://github.com/PlexGit/JS-ThinkTime-Export-pure-HTML/raw/refs/heads/main/ThinkTime-Export-pure-HTML.user.js
+// @downloadURL   https://github.com/PlexGit/JS-ThinkTime-Export-pure-HTML/raw/refs/heads/main/ThinkTime-Export-pure-HTML.user.js
 // ==/UserScript==
 
 (function() {
