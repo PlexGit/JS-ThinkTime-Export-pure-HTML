@@ -1,8 +1,8 @@
 // ==UserScript==
 // @name          ThinkTime - Export pure HTML
 // @namespace     http://tampermonkey.net/
-// @version       1.06
-// @description   Add Print View button for Knowlege Base articles on ThinkTime platform
+// @version       1.07
+// @description   Adds a "Download" button to ThinkTime Knowledge Base and News articles
 // @author        Oleksandr Pylypchak
 // @match         https://*.thinktime.com/ui/knowledge-bases/*/articles/*
 // @match         https://*.thinktime.com/ui/knowledge-bases/articles/*
@@ -89,7 +89,6 @@
 		htmlElement.removeAttribute("style");
 		htmlElement.removeAttribute("lang");
 		htmlElement.removeAttribute("data-js-focus-visible");
-		htmlElement.removeAttribute("data-class");
 
 		const wysiwygElements = document.querySelectorAll('[style*="--wysiwyg"]');
 		wysiwygElements.forEach(el => {
@@ -202,7 +201,7 @@
 			innerSections.forEach((innerSection) => { innerSection.remove(); });
 		});
 
-		const attributesToRemove = ["id", "class", "base", "data-cy", "data-test-landmark", "data-new-gr-c-s-check-loaded", "data-gr-ext-installed", "data-test-distinct"];
+		const attributesToRemove = ["id", "class", "base", "data-cy", "data-test-landmark", "data-new-gr-c-s-check-loaded", "data-gr-ext-installed", "data-test-distinct", "data-class"];
 		const allElements = document.getElementsByTagName("*");
 		for (const element of allElements) {
 			attributesToRemove.forEach((attributeName) => element.removeAttribute(attributeName));
