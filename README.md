@@ -1,6 +1,6 @@
 # JS-ThinkTime-Export-pure-HTML
 
-This script adds a "Download" button to ThinkTime Knowledge Base and News articles.
+Adds a "Download" button to ThinkTime Knowledge Base and News articles.
 It generates a standalone HTML file featuring inline CSS and Base64-encoded images, ensuring all content is embedded locally.
 Each export includes essential metadata: the original page title, source URL, and a backup timestamp.
 
